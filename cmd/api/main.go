@@ -8,12 +8,13 @@ import (
 	"Ultimo_trabalho_Go/internal/handler"
 	"Ultimo_trabalho_Go/internal/repository"
 	"Ultimo_trabalho_Go/internal/service"
+
 	_ "github.com/lib/pq"
 )
 
 func main() {
 	// "postgresql://<username>:<password>@<database_ip>/todos?sslmode=disable"
-	dsn := "postgresql://postgres:root@localhost/postgres?sslmode=disable"
+	dsn := "postgresql://postgres:5000@localhost/postgres?sslmode=disable"
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
@@ -26,7 +27,7 @@ func main() {
 	enemyRepository := repository.NewEnemyRepository(db)
 	enemyService := service.NewEnemyService(*enemyRepository)
 	enemyHandler := handler.NewEnemyHandler(enemyService)
-     
+
 	battleRepository := repository.NewBattleRepository(db)
 	battleService := service.NewBattleService(*playerRepository, *enemyRepository, *battleRepository)
 	battleHandler := handler.NewBattleHandler(battleService)
@@ -45,7 +46,6 @@ func main() {
 	mux.HandleFunc("PUT /enemy/{id}", enemyHandler.SaveEnemy)
 	mux.HandleFunc("POST /battle", battleHandler.CreateBattle)
 	mux.HandleFunc("GET /battle", battleHandler.LoadBattles)
-
 
 	fmt.Println("Server is running on port 8080")
 	if err := http.ListenAndServe(":8080", mux); err != nil {

@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 
-
 	"Ultimo_trabalho_Go/internal/entity"
 	"Ultimo_trabalho_Go/internal/repository"
 )
@@ -37,11 +36,16 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 		return nil, errors.New("both player and enemy must have life > 0 to battle")
 	}
 
+	// Gera um valor para DiceThrown (número do dado)
 	battle := entity.NewBattle(player.ID, enemy.ID, player.Nickname, enemy.Nickname)
 	dice := battle.DiceThrown
 
 	if dice <= 3 {
-		player.Life -= enemy.Attack
+		damage := enemy.Attack - player.Defesa
+		if damage < 0 {
+			damage = 0
+		}
+		player.Life -= damage
 		if player.Life < 0 {
 			player.Life = 0
 		}
@@ -50,7 +54,11 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 		}
 		battle.Result = "Enemy won"
 	} else {
-		enemy.Life -= player.Attack
+		damage := player.Attack - enemy.Defesa
+		if damage < 0 {
+			damage = 0
+		}
+		enemy.Life -= damage
 		if enemy.Life < 0 {
 			enemy.Life = 0
 		}
@@ -60,6 +68,7 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 		battle.Result = "Player won"
 	}
 
+	// Insere a batalha no banco de dados
 	if _, err := bs.BattleRepository.AddBattle(battle); err != nil {
 		return nil, err
 	}
@@ -67,24 +76,7 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 	return battle, nil
 }
 
+// Função para carregar batalhas do banco de dados
 func (bs *BattleService) LoadBattles() ([]*entity.Battle, error) {
 	return bs.BattleRepository.LoadBattles()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	 "github.com/google/uuid"
+	"github.com/google/uuid"
 )
 
 type Battle struct {
@@ -17,35 +17,14 @@ type Battle struct {
 	Result     string `json:"result"`
 }
 
-
-
 func NewBattle(playerID, enemyID, playerName, enemyName string) *Battle {
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano()) // Semente para gerar valores aleatórios
 	return &Battle{
 		ID:         uuid.New().String(),
 		PlayerID:   playerID,
 		EnemyID:    enemyID,
 		PlayerName: playerName,
 		EnemyName:  enemyName,
-		DiceThrown: rand.Intn(6) + 1,
+		DiceThrown: rand.Intn(6) + 1, // Gera um número aleatório de 1 a 6
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

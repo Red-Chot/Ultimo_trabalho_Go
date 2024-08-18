@@ -1,8 +1,6 @@
-module main.go
-
+module Ultimo_trabalho_Go
 
 go 1.22.5
-
 
 require (
     github.com/google/uuid v1.6.0
@@ -10,4 +8,3 @@ require (
 
 
 )
-
