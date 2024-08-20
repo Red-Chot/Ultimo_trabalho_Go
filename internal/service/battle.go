@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strconv"
 
 	"Ultimo_trabalho_Go/internal/entity"
 	"Ultimo_trabalho_Go/internal/repository"
@@ -21,27 +22,29 @@ func NewBattleService(playerRepo repository.PlayerRepository, enemyRepo reposito
 	}
 }
 
-func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*entity.Battle, error) {
+func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*entity.Battle, string, error) {
 	player, err := bs.PlayerRepository.LoadPlayerByNickname(playerNickname)
 	if err != nil || player == nil {
-		return nil, errors.New("player not found")
+		return nil, "", errors.New("jogador não encontrado")
 	}
 
 	enemy, err := bs.EnemyRepository.LoadEnemyByNickname(enemyNickname)
 	if err != nil || enemy == nil {
-		return nil, errors.New("enemy not found")
+		return nil, "", errors.New("inimigo não encontrado")
 	}
 
 	if player.Life <= 0 || enemy.Life <= 0 {
-		return nil, errors.New("both player and enemy must have life > 0 to battle")
+		return nil, "", errors.New("tanto o jogador quanto o inimigo devem ter vida > 0 para batalhar")
 	}
 
-	// Gera um valor para DiceThrown (número do dado)
 	battle := entity.NewBattle(player.ID, enemy.ID, player.Nickname, enemy.Nickname)
 	dice := battle.DiceThrown
 
+	var result string
+
 	if dice <= 3 {
-		damage := enemy.Attack - player.Defesa
+		// Calcular o dano considerando a armadura (antiga "defesa")
+		damage := enemy.Attack - player.Armor
 		if damage < 0 {
 			damage = 0
 		}
@@ -50,11 +53,24 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 			player.Life = 0
 		}
 		if err := bs.PlayerRepository.SavePlayer(player.ID, player); err != nil {
-			return nil, errors.New("failed to update player life")
+			return nil, "", errors.New("falha ao atualizar a vida do jogador")
 		}
-		battle.Result = "Enemy won"
+
+		// Result para o dano causado e dados do jogador
+		damageResult := "Inimigo atacou. Dano causado: " + strconv.Itoa(damage) +
+			" | Vida do Jogador: " + strconv.Itoa(player.Life) +
+			" | Armadura do Jogador: " + strconv.Itoa(player.Armor) + // Alterado de "Defesa" para "Armadura"
+			" | Ataque do Inimigo: " + strconv.Itoa(enemy.Attack)
+
+		// Result para os dados do inimigo
+		enemyResult := "Dados do Inimigo: Vida: " + strconv.Itoa(enemy.Life) +
+			" | Armadura: " + strconv.Itoa(enemy.Armor) + // Alterado de "Defesa" para "Armadura"
+			" | Ataque: " + strconv.Itoa(enemy.Attack)
+
+		result = damageResult + "\n" + enemyResult
 	} else {
-		damage := player.Attack - enemy.Defesa
+		// Calcular o dano considerando a armadura (antiga "defesa")
+		damage := player.Attack - enemy.Armor
 		if damage < 0 {
 			damage = 0
 		}
@@ -63,20 +79,36 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 			enemy.Life = 0
 		}
 		if err := bs.EnemyRepository.SaveEnemy(enemy.ID, enemy); err != nil {
-			return nil, errors.New("failed to update enemy life")
+			return nil, "", errors.New("falha ao atualizar a vida do inimigo")
 		}
-		battle.Result = "Player won"
+
+		// Result para o dano causado e dados do inimigo
+		damageResult := "Jogador atacou. Dano causado: " + strconv.Itoa(damage) +
+			" | Vida do Inimigo: " + strconv.Itoa(enemy.Life) +
+			" | Armadura do Inimigo: " + strconv.Itoa(enemy.Armor) + // Alterado de "Defesa" para "Armadura"
+			" | Ataque do Jogador: " + strconv.Itoa(player.Attack)
+
+		// Result para os dados do jogador
+		playerResult := "Dados do Jogador: Vida: " + strconv.Itoa(player.Life) +
+			" | Armadura: " + strconv.Itoa(player.Armor) + // Alterado de "Defesa" para "Armadura"
+			" | Ataque: " + strconv.Itoa(player.Attack)
+
+		result = damageResult + "\n" + playerResult
 	}
 
-	// Insere a batalha no banco de dados
+	if player.Life == 0 {
+		battle.Result = "Inimigo venceu"
+		result = "Inimigo venceu a batalha"
+	} else if enemy.Life == 0 {
+		battle.Result = "Jogador venceu"
+		result = "Jogador venceu a batalha"
+	} else {
+		battle.Result = "A batalha continua"
+	}
+
 	if _, err := bs.BattleRepository.AddBattle(battle); err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return battle, nil
-}
-
-// Função para carregar batalhas do banco de dados
-func (bs *BattleService) LoadBattles() ([]*entity.Battle, error) {
-	return bs.BattleRepository.LoadBattles()
+	return battle, result, nil
 }

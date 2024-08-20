@@ -18,13 +18,13 @@ type Battle struct {
 }
 
 func NewBattle(playerID, enemyID, playerName, enemyName string) *Battle {
-	rand.Seed(time.Now().UnixNano()) // Semente para gerar valores aleatórios
+	rand.Seed(time.Now().UnixNano())
 	return &Battle{
 		ID:         uuid.New().String(),
 		PlayerID:   playerID,
 		EnemyID:    enemyID,
 		PlayerName: playerName,
 		EnemyName:  enemyName,
-		DiceThrown: rand.Intn(6) + 1, // Gera um número aleatório de 1 a 6
+		DiceThrown: rand.Intn(6) + 1,
 	}
 }

@@ -7,15 +7,15 @@ type Enemy struct {
 	Nickname string
 	Life     int
 	Attack   int
-	Defesa   int
+	Armor    int // Alterado de "Defesa" para "Armor"
 }
 
-func NewEnemy(nickname string, life, attack, defesa int) *Enemy {
+func NewEnemy(nickname string, life, attack, armor int) *Enemy { // Alterado "defesa" para "armor"
 	return &Enemy{
 		ID:       uuid.New().String(),
 		Nickname: nickname,
 		Life:     life,
 		Attack:   attack,
-		Defesa:   defesa,
+		Armor:    armor, // Alterado de "defesa" para "armor"
 	}
 }

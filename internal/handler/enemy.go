@@ -1,4 +1,3 @@
-
 package handler
 
 import (
@@ -28,7 +27,7 @@ func (eh *EnemyHandler) AddEnemy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := eh.EnemyService.AddEnemy(enemy.Nickname, enemy.Life, enemy.Attack, enemy.Defesa)
+	result, err := eh.EnemyService.AddEnemy(enemy.Nickname, enemy.Life, enemy.Attack, enemy.Armor) // Alterado "defesa" para "armor"
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "internal server error"):
@@ -117,7 +116,7 @@ func (eh *EnemyHandler) SaveEnemy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := eh.EnemyService.SaveEnemy(id, enemy.Nickname, enemy.Life, enemy.Attack, enemy.Defesa)
+	result, err := eh.EnemyService.SaveEnemy(id, enemy.Nickname, enemy.Life, enemy.Attack, enemy.Armor) // Alterado "defesa" para "armor"
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "internal server error"):
