@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"math/rand"
 	"strconv"
 
 	"Ultimo_trabalho_Go/internal/entity"
@@ -22,6 +24,19 @@ func NewBattleService(playerRepo repository.PlayerRepository, enemyRepo reposito
 	}
 }
 
+// Critico
+func (bs *BattleService) isCriticalHit() bool {
+	return rand.Intn(100) < 20
+}
+
+func (bs *BattleService) calculateDamage(attack, armor int) int {
+	baseDamage := attack - armor/2
+	if baseDamage < 1 {
+		baseDamage = 1
+	}
+	return baseDamage
+}
+
 func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*entity.Battle, string, error) {
 	player, err := bs.PlayerRepository.LoadPlayerByNickname(playerNickname)
 	if err != nil || player == nil {
@@ -33,6 +48,10 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 		return nil, "", errors.New("inimigo não encontrado")
 	}
 
+	// Logs para diagnóstico
+	fmt.Printf("Player: %s | Attack: %d | Armor: %d | Life: %d\n", player.Nickname, player.Attack, player.Armor, player.Life)
+	fmt.Printf("Enemy: %s | Attack: %d | Armor: %d | Life: %d\n", enemy.Nickname, enemy.Attack, enemy.Armor, enemy.Life)
+
 	if player.Life <= 0 || enemy.Life <= 0 {
 		return nil, "", errors.New("tanto o jogador quanto o inimigo devem ter vida > 0 para batalhar")
 	}
@@ -41,12 +60,14 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 	dice := battle.DiceThrown
 
 	var result string
+	var damage int
 
 	if dice <= 3 {
-		// Calcular o dano considerando a armadura (antiga "defesa")
-		damage := enemy.Attack - player.Armor
-		if damage < 0 {
-			damage = 0
+
+		damage = bs.calculateDamage(enemy.Attack, player.Armor)
+		if bs.isCriticalHit() {
+			damage *= 2
+			fmt.Println("Crítico!")
 		}
 		player.Life -= damage
 		if player.Life < 0 {
@@ -55,24 +76,13 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 		if err := bs.PlayerRepository.SavePlayer(player.ID, player); err != nil {
 			return nil, "", errors.New("falha ao atualizar a vida do jogador")
 		}
-
-		// Result para o dano causado e dados do jogador
-		damageResult := "Inimigo atacou. Dano causado: " + strconv.Itoa(damage) +
-			" | Vida do Jogador: " + strconv.Itoa(player.Life) +
-			" | Armadura do Jogador: " + strconv.Itoa(player.Armor) + // Alterado de "Defesa" para "Armadura"
-			" | Ataque do Inimigo: " + strconv.Itoa(enemy.Attack)
-
-		// Result para os dados do inimigo
-		enemyResult := "Dados do Inimigo: Vida: " + strconv.Itoa(enemy.Life) +
-			" | Armadura: " + strconv.Itoa(enemy.Armor) + // Alterado de "Defesa" para "Armadura"
-			" | Ataque: " + strconv.Itoa(enemy.Attack)
-
-		result = damageResult + "\n" + enemyResult
+		result = "Inimigo atacou. Dano causado: " + strconv.Itoa(damage) + ". Vida restante do jogador: " + strconv.Itoa(player.Life)
 	} else {
-		// Calcular o dano considerando a armadura (antiga "defesa")
-		damage := player.Attack - enemy.Armor
-		if damage < 0 {
-			damage = 0
+
+		damage = bs.calculateDamage(player.Attack, enemy.Armor)
+		if bs.isCriticalHit() {
+			damage *= 2
+			fmt.Println("Crítico! Dano do jogador foi dobrado.")
 		}
 		enemy.Life -= damage
 		if enemy.Life < 0 {
@@ -81,19 +91,7 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 		if err := bs.EnemyRepository.SaveEnemy(enemy.ID, enemy); err != nil {
 			return nil, "", errors.New("falha ao atualizar a vida do inimigo")
 		}
-
-		// Result para o dano causado e dados do inimigo
-		damageResult := "Jogador atacou. Dano causado: " + strconv.Itoa(damage) +
-			" | Vida do Inimigo: " + strconv.Itoa(enemy.Life) +
-			" | Armadura do Inimigo: " + strconv.Itoa(enemy.Armor) + // Alterado de "Defesa" para "Armadura"
-			" | Ataque do Jogador: " + strconv.Itoa(player.Attack)
-
-		// Result para os dados do jogador
-		playerResult := "Dados do Jogador: Vida: " + strconv.Itoa(player.Life) +
-			" | Armadura: " + strconv.Itoa(player.Armor) + // Alterado de "Defesa" para "Armadura"
-			" | Ataque: " + strconv.Itoa(player.Attack)
-
-		result = damageResult + "\n" + playerResult
+		result = "Jogador atacou. Dano causado: " + strconv.Itoa(damage) + ". Vida restante do inimigo: " + strconv.Itoa(enemy.Life)
 	}
 
 	if player.Life == 0 {
@@ -111,4 +109,12 @@ func (bs *BattleService) CreateBattle(playerNickname, enemyNickname string) (*en
 	}
 
 	return battle, result, nil
+}
+
+func (bs *BattleService) LoadBattles() ([]*entity.Battle, error) {
+	return bs.BattleRepository.LoadBattles()
+}
+
+func (bs *BattleService) LoadBattle(id string) (*entity.Battle, error) {
+	return bs.BattleRepository.LoadBattleById(id)
 }

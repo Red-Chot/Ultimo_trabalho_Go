@@ -16,16 +16,16 @@ func NewEnemyService(EnemyRepository repository.EnemyRepository) *EnemyService {
 	return &EnemyService{EnemyRepository: EnemyRepository}
 }
 
-func (es *EnemyService) AddEnemy(nickname string, life, attack, armor int) (*entity.Enemy, error) { // Alterado "defesa" para "armor"
+func (es *EnemyService) AddEnemy(nickname string, life, attack, armor int) (*entity.Enemy, error) {
 	if nickname == "" || life == 0 || attack == 0 || armor == 0 {
-		return nil, errors.New("enemy nickname, life, attack and armor is required") // Alterado "defesa" para "armor"
+		return nil, errors.New("enemy nickname, life, attack and armor is required") 
 	}
 
 	if len(nickname) > 255 {
 		return nil, errors.New("enemy nickname cannot exceed 255 characters")
 	}
 	if armor > 10 || armor <= 0 {
-		return nil, errors.New("enemy armor must be between 1 and 10") // Alterado "defesa" para "armor"
+		return nil, errors.New("enemy armor must be between 1 and 10") 
 	}
 	if attack > 10 || attack <= 0 {
 		return nil, errors.New("enemy attack must be between 1 and 10")
@@ -44,7 +44,7 @@ func (es *EnemyService) AddEnemy(nickname string, life, attack, armor int) (*ent
 		return nil, errors.New("enemy nickname already exists")
 	}
 
-	enemy = entity.NewEnemy(nickname, life, attack, armor) // Alterado "defesa" para "armor"
+	enemy = entity.NewEnemy(nickname, life, attack, armor) 
 	if _, err := es.EnemyRepository.AddEnemy(enemy); err != nil {
 		fmt.Println(err)
 		return nil, errors.New("internal server error")
@@ -94,7 +94,7 @@ func (es *EnemyService) LoadEnemy(id string) (*entity.Enemy, error) {
 	return enemy, nil
 }
 
-func (es *EnemyService) SaveEnemy(id, nickname string, life, attack, armor int) (*entity.Enemy, error) { // Alterado "defesa" para "armor"
+func (es *EnemyService) SaveEnemy(id, nickname string, life, attack, armor int) (*entity.Enemy, error) {
 	enemy, err := es.EnemyRepository.LoadEnemyById(id)
 
 	if err != nil {
@@ -126,11 +126,11 @@ func (es *EnemyService) SaveEnemy(id, nickname string, life, attack, armor int) 
 		}
 		enemy.Attack = attack
 	}
-	if armor != 0 && armor != enemy.Armor { // Alterado "defesa" para "armor"
+	if armor != 0 && armor != enemy.Armor { 
 		if armor > 10 || armor <= 0 {
-			return nil, errors.New("enemy armor must be between 1 and 10") // Alterado "defesa" para "armor"
+			return nil, errors.New("enemy armor must be between 1 and 10")
 		}
-		enemy.Armor = armor // Alterado "defesa" para "armor"
+		enemy.Armor = armor 
 	}
 
 	if life != 0 && life != enemy.Life {

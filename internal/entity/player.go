@@ -7,15 +7,15 @@ type Player struct {
 	Nickname string
 	Life     int
 	Attack   int
-	Armor    int // Alterado de "Defesa" para "Armor"
+	Armor    int 
 }
 
-func NewPlayer(nickname string, life, attack, armor int) *Player { // Alterado "defesa" para "armor"
+func NewPlayer(nickname string, life, attack, armor int) *Player { 
 	return &Player{
 		ID:       uuid.New().String(),
 		Nickname: nickname,
 		Life:     life,
 		Attack:   attack,
-		Armor:    armor, // Alterado de "defesa" para "armor"
+		Armor:    armor, 
 	}
 }

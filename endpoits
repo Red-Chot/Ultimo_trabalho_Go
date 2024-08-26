@@ -1,0 +1,75 @@
+
+
+1. Endpoints para Jogador (Player)
+
+    Método: POST
+    Endpoint: /player
+    Descrição: Adiciona um novo jogador ao jogo
+    Gravar jogador
+
+    Método: GET
+    Endpoint: /player
+    Descrição: Retorna a lista de todos os jogadores
+    Obter Detalhes de um Jogador
+
+    Método: GET
+    Endpoint: /player/{id}
+    Descrição: Retorna os detalhes de um jogador específico pelo ID
+    Atualizar um Jogador
+
+    Método: PUT
+    Endpoint: /player/{id}
+    Descrição: Atualiza os detalhes de um jogador específico
+    Excluir um Jogador
+
+    Método: DELETE
+    Endpoint: /player/{id}
+    Descrição: Remove um jogador do jogo
+
+
+2. Endpoints para Inimigo (Enemy)
+
+    Método: POST
+    Endpoint: /enemy
+    Descrição: Adiciona um novo inimigo ao jogo
+    Gravar Inimigo
+
+    Método: GET
+    Endpoint: /enemy
+    Descrição: Retorna a lista de todos os inimigos
+    Obter Detalhes de um Inimigo
+
+    Método: GET
+    Endpoint: /enemy/{id}
+    Descrição: Retorna os detalhes de um inimigo específico pelo ID.
+    Atualizar um Inimigo
+
+    Método: PUT
+    Endpoint: /enemy/{id}
+    Descrição: Atualiza os detalhes de um inimigo específico
+    Excluir um Inimigo
+
+    Método: DELETE
+    Endpoint: /enemy/{id}
+    Descrição: Remove um inimigo do jogo
+
+
+3. Endpoints para Batalha (Battle)
+
+    Método: POST
+    Endpoint: /battle
+    Descrição: Inicia uma nova batalha entre um jogador e um inimigo.
+    Gravar Batalhas
+
+    Método: GET
+    Endpoint: /battle
+    Descrição: Retorna a lista de todas as batalhas
+    Obter Detalhes de uma Batalha
+
+    Método: GET
+    Endpoint: /battle/{id}
+    Descrição: Retorna os detalhes de uma batalha específica
+
+
+
+    

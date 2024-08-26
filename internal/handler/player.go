@@ -27,7 +27,7 @@ func (ph *PlayerHandler) AddPlayer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := ph.PlayerService.AddPlayer(player.Nickname, player.Life, player.Attack, player.Armor) // Alterado "defesa" para "armor"
+	result, err := ph.PlayerService.AddPlayer(player.Nickname, player.Life, player.Attack, player.Armor) 
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "internal server error"):

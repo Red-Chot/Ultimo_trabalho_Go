@@ -16,6 +16,6 @@ func NewEnemy(nickname string, life, attack, armor int) *Enemy { // Alterado "de
 		Nickname: nickname,
 		Life:     life,
 		Attack:   attack,
-		Armor:    armor, // Alterado de "defesa" para "armor"
+		Armor:    armor, 
 	}
 }

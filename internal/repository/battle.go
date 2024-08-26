@@ -42,3 +42,16 @@ func (br *BattleRepository) LoadBattles() ([]*entity.Battle, error) {
 	}
 	return battles, nil
 }
+
+func (br *BattleRepository) LoadBattleById(id string) (*entity.Battle, error) {
+	var battle entity.Battle
+	err := br.db.QueryRow("SELECT id, playerid, enemyid, playername, enemyname, dicethrown, result FROM battle WHERE id = $1", id).Scan(
+		&battle.ID, &battle.PlayerID, &battle.EnemyID, &battle.PlayerName, &battle.EnemyName, &battle.DiceThrown, &battle.Result)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &battle, nil
+}
